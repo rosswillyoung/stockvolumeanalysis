@@ -35,7 +35,10 @@ def get_average_volume(symbol):
         sum_of_items += volume
         number_of_items += 1
 
-    average_volume = sum_of_items / number_of_items
+    try:
+        average_volume = sum_of_items / number_of_items
+    except ZeroDivisionError:
+        return
     # print('Average Volume for ' + symbol + ': ' + str(average_volume))
     return average_volume
 
@@ -47,4 +50,4 @@ with open('companyvolume.csv', 'w', newline='') as csvfile:
         volume = get_average_volume(str(i))
         if volume:
             writer.writerow([str(i), str(volume)])
-        time.sleep(.5)
+        time.sleep(5)
