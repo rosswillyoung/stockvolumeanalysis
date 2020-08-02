@@ -50,4 +50,4 @@ with open('companyvolume.csv', 'w', newline='') as csvfile:
         volume = get_average_volume(str(i))
         if volume:
             writer.writerow([str(i), str(volume)])
-        time.sleep(5)
+        time.sleep(15)

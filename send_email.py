@@ -4,22 +4,20 @@ import json
 
 port = 465
 
-with open('emailcreds.json') as f:
-    data = json.load(f)
-    email = data['email']
-    password = data['password']
 
-sender_email = email
+def send_email(message):
+    with open('emailcreds.json') as f:
+        data = json.load(f)
+        email = data['email']
+        password = data['password']
 
-receiver_email = email
-message = """\
-Subject: Test Message
+    sender_email = email
+    message = message
 
-Hello World
-"""
-context = ssl.create_default_context()
+    receiver_email = email
+    context = ssl.create_default_context()
 
-with smtplib.SMTP_SSL('smtp.gmail.com', port, context=context) as server:
-    server.login(email, password)
+    with smtplib.SMTP_SSL('smtp.gmail.com', port, context=context) as server:
+        server.login(email, password)
 
-    server.sendmail(sender_email, receiver_email, message)
+        server.sendmail(sender_email, receiver_email, message)
