@@ -2,14 +2,18 @@
 import yfinance as yf
 from pandas_datareader import data as pdr
 import csv
+from datetime import date, timedelta
 
 yf.pdr_override()
 company_list = []
-with open('companylist.csv', newline='') as csvfile:
-    reader = csv.reader(csvfile)
-    for row in reader:
-        company_list.append(row[0])
-company_list.pop(0)
+
+
+def get_stocks():
+    with open('companylist.csv', newline='') as csvfile:
+        reader = csv.reader(csvfile)
+        for row in reader:
+            company_list.append(row[0])
+    company_list.pop(0)
 
 
 def get_average_volume(symbol):
@@ -30,11 +34,29 @@ def get_average_volume(symbol):
     return average_volume
 
 
-with open('newcompanyvolume.csv', 'w', newline='') as csvfile:
-    for i in company_list:
-        writer = csv.writer(csvfile, delimiter=',')
-        try:
-            volume = get_average_volume(str(i))
-        except:
-            pass
-        writer.writerow([str(i), str(volume)])
+def add_stocks_to_csv():
+    with open('newcompanyvolume.csv', 'w', newline='') as csvfile:
+        for i in company_list:
+            writer = csv.writer(csvfile, delimiter=',')
+            try:
+                volume = get_average_volume(str(i))
+            except:
+                pass
+            writer.writerow([str(i), str(volume)])
+
+
+def get_volume_and_price(symbol):
+    data = pdr.get_data_yahoo(symbol, date.today(),
+                              date.today() + timedelta(days=1))
+    high = data['High']
+    volume = data['Volume']
+    return int(volume), float(high)
+
+
+def main():
+    get_stocks()
+    add_stocks_to_csv()
+
+
+if __name__ == '__main__':
+    main()

@@ -2,9 +2,11 @@ import csv
 import requests
 import json
 import time
+import math
 
 import scrape_volume
 import send_email
+import process_data
 
 volume_dict = {}
 
@@ -22,7 +24,9 @@ def compare_volume_to_average(symbol, average_volume):
           average_volume + ' to current: ' + str(current_volume))
 
     try:
-        if current_volume > (5 * float(average_volume)):
+        if float(average_volume) < 20:
+            return
+        if current_volume > (5 * math.floor(float(average_volume))):
             # print(symbol + 'average volume: ' + average_volume +
             #   'current volume: ' + str(current_volume))
             message = ("Subject: " + symbol + "\n" +
@@ -32,6 +36,8 @@ def compare_volume_to_average(symbol, average_volume):
                        "https://finance.yahoo.com/quote/" + symbol
                        )
             send_email.send_email(message)
+            process_data.add_stock_to_table(
+                symbol, current_volume, average_volume)
     except ValueError:
         return
     except TypeError:

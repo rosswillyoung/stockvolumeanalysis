@@ -1,6 +1,19 @@
 import sqlite3
 from datetime import date
 
+import volume_data
+
+
+def create_connection(db_file):
+    conn = None
+
+    try:
+        conn = sqlite3.connect(db_file)
+    except Exception as e:
+        print(e)
+
+    return conn
+
 
 def add_stock_to_table(symbol, current_volume, average_volume):
     conn = sqlite3.connect('stocks.db')
@@ -16,20 +29,24 @@ def add_stock_to_table(symbol, current_volume, average_volume):
     return symbol + ' added into table'
 
 
-# print(add_stock_to_table('MSFT', 100000, 100000))
-
-# conn = sqlite3.connect('stocks.db')
-
-# c = conn.cursor()
-# c.execute("SELECT * FROM volume_data")
-# print(c.fetchall())
-
-# conn.commit()
-# conn.close()
-
-def update_price(symbol, price, date):
-    conn = sqlite3.connect('stocks.db')
+def update_price_and_volume(conn, task):
     c = conn.cursor()
-    c.execute("UPDATE volume_data SET price_at_close = ? WHERE symbol = ? AND date = ?", (price, symbol, date))
+    sql = "UPDATE volume_data SET price_at_close = ?, current_volume = ? WHERE symbol = ? AND date = ?"
+    c.execute(sql, task)
+    conn.commit()
 
-update_price('MSFT', 20.0, '')
+
+def main():
+    database = r'C:\Users\Ross\Documents\pythonfun\stockvolume\stocks.db'
+
+    # conn = create_connection(database)
+    # with conn:
+    #     update_price_and_volume(conn, (9999, 78877000, 'MSFT', '2020-08-03'))
+
+    volume, high = volume_data.get_volume_and_price('fb')
+    print(volume)
+    print(high)
+
+
+if __name__ == '__main__':
+    main()
