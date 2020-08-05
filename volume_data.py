@@ -53,6 +53,12 @@ def get_volume_and_price(symbol):
     return int(volume), float(high)
 
 
+def get_days_high(symbol, date):
+    data = pdr.get_data_yahoo(symbol, date, date + timedelta(days=1))
+    high = data['High']
+    return float(high)
+
+
 def main():
     get_stocks()
     add_stocks_to_csv()

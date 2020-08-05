@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import date
+from datetime import date, timedelta
 
 import volume_data
 
@@ -36,16 +36,31 @@ def update_price_and_volume(conn, task):
     conn.commit()
 
 
+def update_all_yesterday(conn):
+    yesterday = date.today() - timedelta(days=1)
+    yesterday = str(yesterday)
+    # with conn:
+    c = conn.cursor()
+    c.execute("SELECT symbol FROM volume_data WHERE date = ?", (yesterday,))
+    symbol_list = []
+    for i in c.fetchall():
+        symbol_list.append(i)
+    # print(symbol_list)
+    for i in symbol_list:
+        try:
+            volume, high = volume_data.get_volume_and_price(i)
+            update_price_and_volume(conn, (high, volume, i[0], yesterday))
+        except TypeError:
+            pass
+
+
 def main():
     database = r'C:\Users\Ross\Documents\pythonfun\stockvolume\stocks.db'
-
-    # conn = create_connection(database)
-    # with conn:
-    #     update_price_and_volume(conn, (9999, 78877000, 'MSFT', '2020-08-03'))
-
-    volume, high = volume_data.get_volume_and_price('fb')
-    print(volume)
-    print(high)
+    conn = create_connection(database)
+    with conn:
+        update_all_yesterday(conn)
+        day = date.today() - timedelta(days=7)
+        # print(volume_data.get_days_high('fb', day))
 
 
 if __name__ == '__main__':
