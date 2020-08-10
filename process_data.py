@@ -2,6 +2,7 @@ import sqlite3
 from datetime import date, timedelta
 
 import volume_data
+import send_email
 
 
 def create_connection(db_file):
@@ -55,12 +56,24 @@ def update_all_yesterday(conn):
 
 
 def main():
-    database = r'C:\Users\Ross\Documents\pythonfun\stockvolume\stocks.db'
+    database = r'stocks.db'
     conn = create_connection(database)
     with conn:
         update_all_yesterday(conn)
-        day = date.today() - timedelta(days=7)
-        # print(volume_data.get_days_high('fb', day))
+        last_week = date.today() - timedelta(days=7)
+        last_weeks_data = volume_data.get_last_weeks_data(conn, last_week)
+        print(last_weeks_data[0][1])
+        for i in last_weeks_data:
+            symbol = i[1]
+            last_week_high = volume_data.get_days_high(symbol, last_week)
+            todays_high = volume_data.get_days_high(symbol,
+                                                    date.today())
+            if last_week_high < todays_high:
+                send_email.send_email(symbol + " alert")
+                # print(volume_data.get_days_high('fb', day))
+            else:
+                print(str(last_week_high) +
+                      " is greater than or equal to " + str(todays_high))
 
 
 if __name__ == '__main__':

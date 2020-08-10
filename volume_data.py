@@ -3,6 +3,7 @@ import yfinance as yf
 from pandas_datareader import data as pdr
 import csv
 from datetime import date, timedelta
+import sqlite3
 
 yf.pdr_override()
 company_list = []
@@ -57,6 +58,12 @@ def get_days_high(symbol, date):
     data = pdr.get_data_yahoo(symbol, date, date + timedelta(days=1))
     high = data['High']
     return float(high)
+
+
+def get_last_weeks_data(conn, date):
+    c = conn.cursor()
+    c.execute("SELECT * FROM volume_data WHERE date = ?", (date,))
+    return c.fetchall()
 
 
 def main():
