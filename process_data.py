@@ -66,10 +66,15 @@ def main():
         for i in last_weeks_data:
             symbol = i[1]
             last_week_high = volume_data.get_days_high(symbol, last_week)
+            if last_week_high == 0:
+                return
             todays_high = volume_data.get_days_high(symbol,
                                                     date.today())
             if last_week_high < todays_high:
-                send_email.send_email(symbol + " alert")
+                message = ("Subject: " + symbol + " alert\n\n" +
+                           str(todays_high) + " is greater than last weeks high " +
+                           str(last_week_high) + ". https://finance.yahoo.com/quote/" + symbol)
+                send_email.send_email(message)
                 # print(volume_data.get_days_high('fb', day))
             else:
                 print(str(last_week_high) +
